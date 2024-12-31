@@ -1,9 +1,17 @@
-import { useState } from 'react'
+import { useState, useContext, useEffect } from 'react'
+import FeedbackContext from '../context/FeedbackContext'
 
 function RatingSelect({ select }) {
  
   // State to store the currently selected rating, default is 10
   const [selected, setSelected] = useState(10)
+
+  const {feedbackEdit} = useContext(FeedbackContext)
+
+  useEffect(() => {
+    setSelected(feedbackEdit.item.rating)
+  }, [feedbackEdit])
+
   
   // Handle changes in the selected rating
   const handleChange = (e) => {
