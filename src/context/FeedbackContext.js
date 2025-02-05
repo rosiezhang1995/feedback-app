@@ -17,24 +17,40 @@ export const FeedbackProvider = ({ children }) => {
 
   // Fetch Feedback
   const fetchFeedback = async () => {
-    // Fetch data with newest items first (_order=desc)
-    const response = await fetch(`/feedback?_sort=id&_order=desc`);
+    const response = await fetch(`/feedback?_sort=date&_order=desc`);
     const data = await response.json();
-    setFeedback(data);
+
+    // Sort explicitly after fetching
+    const sortedData = [...data].sort((a, b) => {
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    });
+    setFeedback(sortedData);
     setIsLoading(false);
   };
 
   // Add feedback
   const addFeedback = async (newFeedback) => {
+    const feedbackWithDate = {
+      ...newFeedback,
+      date: new Date().toISOString(), // Add date time to new feedback
+    };
+
     const response = await fetch('/feedback', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(newFeedback),
+      body: JSON.stringify(feedbackWithDate),
     });
+
     const data = await response.json();
-    setFeedback([data, ...feedback]);
+
+    // Sort explicitly when adding
+    const newFeedbackArray = [...feedback, data].sort((a, b) => {
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    });
+
+    setFeedback(newFeedbackArray);
   };
 
   // Delete feedbcak
